@@ -39,6 +39,7 @@ module God
             formatted_extra = extra.size > 0 ? " #{extra.inspect}" : ""
             self.info = "process #{pid} exited#{formatted_extra}"
             self.watch.trigger(self)
+            EventHandler.deregister(pid, :proc_exit)
           end
 
           msg = "#{self.watch.name} registered 'proc_exit' event for pid #{pid}"
@@ -49,16 +50,7 @@ module God
       end
 
       def deregister
-        pid = self.pid
-        if pid
-          EventHandler.deregister(pid, :proc_exit)
 
-          msg = "#{self.watch.name} deregistered 'proc_exit' event for pid #{pid}"
-          applog(self.watch, :info, msg)
-        else
-          pid_file_location = self.pid_file || self.watch.pid_file
-          applog(self.watch, :error, "#{self.watch.name} could not deregister: no cached PID or PID file #{pid_file_location} (#{self.base_name})")
-        end
       end
     end
 
